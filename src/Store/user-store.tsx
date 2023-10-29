@@ -1,39 +1,63 @@
-import { action, computed, makeAutoObservable, makeObservable, observable, observe } from 'mobx'
-import { SubmitHandler } from 'react-hook-form'
-import User from '../Components/User'
+import { makeAutoObservable } from 'mobx'
 import { UserTypes } from "../Types/userForm.interface"
 
 
+class UserStore {
 
-class UsersStore {
-    users: any[] = []
-
+    users: UserTypes[] = []
+    fetchUsersValue: UserTypes[] = []
+    editFormValue: UserTypes | null = null
+    navValue = 0
 
     constructor() {
         makeAutoObservable(this)
     }
-    // fetchUsers = () => {
-    //     return this.users
-    // }
 
-
-    addUser(user: object) {
-        this.users.push(user)
+    addUser(user: UserTypes) {
+        this.fetchUsersValue.unshift(user);
+        this.users = this.fetchUsersValue;
     }
 
     removeUser(username: string) {
-        this.users = this.users.filter(user => user !== user)
+        this.fetchUsersValue = this.users.filter((user: UserTypes) => user.username !== username)
+        this.users = this.fetchUsersValue;
     }
 
-    // addUser({name, username,phone,email}:UserTypes) {
-    //     const newUser = User.create({
-    //       name,
-    //       username,
-    //       phone,
-    //       email
-    //     });
-    //     this.users.push(newUser);
-    //   }
+    searchUser(query: string) {
+        if (!query) {
+            this.users = this.fetchUsersValue
+        }
+        const filtered =
+            this.fetchUsersValue.filter(user => user.username.toLowerCase().includes(query.toLowerCase()))
+        this.users = filtered
+    }
+
+    fetchUsers() {
+        fetch('https://jsonplaceholder.typicode.com/users')
+            .then(response => response.json())
+            .then(json => {
+                this.users = [...json]
+                this.fetchUsersValue = [...json]
+            })
+    }
+
+    preUserUpdate(user: UserTypes) {
+        this.navValue = 1;
+        this.editFormValue = user;
+    }
+
+    updateUser({ oldUsername, ...user_data } : UserTypes & { oldUsername: string }) {
+        this.fetchUsersValue = this.fetchUsersValue.map((user: UserTypes) => {
+            return user.username === oldUsername ? user_data : user;
+        });
+        this.users = this.fetchUsersValue;
+        this.editFormValue = null;
+        this.navValue = 0;
+    }
+
+    NavhandleChange = (event: React.SyntheticEvent, newValue: number) => {
+        this.navValue = newValue;
+    };
 }
 
-export default new UsersStore();
+export default new UserStore();
