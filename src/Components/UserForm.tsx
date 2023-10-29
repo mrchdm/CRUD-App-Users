@@ -7,6 +7,7 @@ import {Stack} from "@mui/material";
 import UserStore from "../Store/user-store";
 import UsersService from "../API/UsersService";
 import { observer } from "mobx-react-lite";
+import { useEffect } from 'react';
 
 type UserProps = {
   users: object[]
