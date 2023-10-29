@@ -3,8 +3,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { UserTypes } from "../Types/userForm.interface"
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { Grid, Input, Typography } from "@mui/material";
-import { render } from "react-dom";
+import {Stack} from "@mui/material";
 import UserStore from "../Store/user-store";
 import UsersService from "../API/UsersService";
 import { observer } from "mobx-react-lite";
